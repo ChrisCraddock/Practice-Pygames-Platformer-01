@@ -2,7 +2,7 @@
 import pygame
 from sys import exit
 
-
+#game variables
 GAME_WIDTH = 512
 GAME_HEIGHT = 512
 

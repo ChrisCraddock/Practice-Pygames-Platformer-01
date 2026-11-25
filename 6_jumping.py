@@ -1,0 +1,93 @@
+
+import pygame
+from sys import exit
+import os
+
+#game variables
+GAME_WIDTH = 512
+GAME_HEIGHT = 512
+
+PLAYER_X = GAME_WIDTH/2
+PLAYER_Y = GAME_HEIGHT/2
+PLAYER_WIDTH = 42 #7:8 ratio 210 7x30 7*6
+PLAYER_HEIGHT = 48 #7:8 ratio 240 8x30 8*6
+
+PLAYER_DISTANCE = 5 #movement speed
+'''Jumping: When jumping we go in the -y direction'''
+PLAYER_VELOCITY_Y = -10 
+'''Gravity'''
+GRAVITY = 0.5
+'''Game Floor'''
+FLOOR_Y = GAME_HEIGHT * 3/4
+
+#Images
+#load images. folder/name, image
+background_image = pygame.image.load(os.path.join('assets/images','background.png'))
+player_image_right = pygame.image.load(os.path.join('assets/images','megaman-right.png'))
+player_image_right = pygame.transform.scale(player_image_right,(PLAYER_WIDTH,PLAYER_HEIGHT))
+
+
+pygame.init()
+window = pygame.display.set_mode((GAME_HEIGHT,GAME_WIDTH))
+pygame.display.set_caption("Fuzzy's Window Title") 
+pygame.display.set_icon(player_image_right)
+clock = pygame.time.Clock() 
+
+#Player Class
+class Player(pygame.Rect): #class Player(inherit pygame.Rect)
+    def __init__(self): #will describe latter
+        pygame.Rect.__init__(self, PLAYER_X, PLAYER_Y, PLAYER_WIDTH, PLAYER_HEIGHT)
+        self.image = player_image_right
+        '''add velocity_y and set to 0'''
+        self.velocity_y = 0
+        '''add boolean to keep from constant jumping'''
+        self.jumping = False
+
+
+player = Player()
+
+
+'''Move Function'''
+def move():
+    player.velocity_y += GRAVITY #assign gravity to player velocity
+    player.y += player.velocity_y #.velocity_y is called in class Player
+    '''.y is the top of the image, .height is the bottom of the image'''
+    if player.y + player.height > FLOOR_Y:
+        player.y = FLOOR_Y - player.height
+        '''Reference key up, if fall back on floor set value to False again'''
+        player.jumping = False
+
+#Draw Function
+def draw():
+    window.fill((20,18,167))
+    window.blit(background_image, (0,80))
+    window.blit(player.image, player)
+
+
+while True: 
+    for event in pygame.event.get(): 
+        if event.type == pygame.QUIT: #1st event
+            pygame.quit() 
+            exit()
+
+    #Hold keys instead of constant pressing
+    keys = pygame.key.get_pressed()  #2nd event
+    #Boundry: Top
+    if keys[pygame.K_UP] or keys[pygame.K_w] and not player.jumping: #check to see if player is already jumping
+        '''Reconfigured recognizing top boundry as 'gravity' will be added'''
+        player.velocity_y = PLAYER_VELOCITY_Y #.velocity_y is called in class Player
+        '''Removed Down arrow key as this game will not require ducking or going down'''
+        player.jumping = True #reference class Player to change from False to True
+
+    #Boundry: Left
+    if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        player.x = max(player.x-PLAYER_DISTANCE,0)
+    #Boundry: Right
+    if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        player.x = min(player.x+PLAYER_DISTANCE,GAME_WIDTH-player.width)
+
+    '''Move function added'''
+    move()
+    draw()
+    pygame.display.update()  
+    clock.tick(60) 
