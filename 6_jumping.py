@@ -11,6 +11,9 @@ PLAYER_X = GAME_WIDTH/2
 PLAYER_Y = GAME_HEIGHT/2
 PLAYER_WIDTH = 42 #7:8 ratio 210 7x30 7*6
 PLAYER_HEIGHT = 48 #7:8 ratio 240 8x30 8*6
+'''Add scaling for images not matching default image'''
+PLAYER_JUMP_WIDTH = 52
+PLAYER_JUMP_HEIGHT = 60
 
 PLAYER_DISTANCE = 5 #movement speed
 '''Jumping: When jumping we go in the -y direction'''
@@ -21,10 +24,21 @@ GRAVITY = 0.5
 FLOOR_Y = GAME_HEIGHT * 3/4
 
 #Images
-#load images. folder/name, image
-background_image = pygame.image.load(os.path.join('assets/images','background.png'))
-player_image_right = pygame.image.load(os.path.join('assets/images','megaman-right.png'))
-player_image_right = pygame.transform.scale(player_image_right,(PLAYER_WIDTH,PLAYER_HEIGHT))
+'''Function to scale images when loaded'''
+def load_image(image_name,scale=None): #not all images will need scaling
+    image = pygame.image.load(os.path.join('assets/images',image_name)) #image_name = param in load_image and is file path
+    if scale != None:
+        image = pygame.transform.scale(image, scale) #reference image variable above and scale param
+    return image
+
+background_image = load_image('background.png')
+player_image_right = load_image('megaman-right.png',(PLAYER_WIDTH,PLAYER_HEIGHT))
+'''Removed'''
+#player_image_right = pygame.transform.scale(player_image_right,(PLAYER_WIDTH,PLAYER_HEIGHT))
+'''Added'''
+player_image_left = load_image('megaman-left.png',(PLAYER_WIDTH,PLAYER_HEIGHT))
+player_image_jump_right = load_image('megaman-right-jump.png',(PLAYER_JUMP_WIDTH,PLAYER_JUMP_HEIGHT))
+player_image_jump_left = load_image('megaman-left-jump.png',(PLAYER_JUMP_WIDTH,PLAYER_JUMP_HEIGHT))
 
 
 pygame.init()
@@ -40,8 +54,27 @@ class Player(pygame.Rect): #class Player(inherit pygame.Rect)
         self.image = player_image_right
         '''add velocity_y and set to 0'''
         self.velocity_y = 0
+        '''Set default direction to "right"'''
+        self.direction = "right"
         '''add boolean to keep from constant jumping'''
         self.jumping = False
+
+    '''Have Player class handle image updates'''
+    def update_image(self):
+        if self.jumping:
+            self.width = PLAYER_JUMP_WIDTH #standerdize collision checking
+            self.height = PLAYER_JUMP_HEIGHT #standerdize collision checking
+            if self.direction == "right": #if the .direction above is changed to 'right and jumping'
+                self.image = player_image_jump_right
+            elif self.direction == "left": #if the .direction above is changed to 'left and jumping'
+                self.image = player_image_jump_left
+        else:
+            self.width = PLAYER_JUMP_WIDTH #standerdize collision checking
+            self.height = PLAYER_JUMP_HEIGHT #standerdize collision checking
+            if self.direction == "right": #if the .direction above is changed to 'right'
+                self.image = player_image_right
+            elif self.direction == "left": #if the .direction above is changed to 'left'
+                self.image = player_image_left
 
 
 player = Player()
@@ -61,6 +94,7 @@ def move():
 def draw():
     window.fill((20,18,167))
     window.blit(background_image, (0,80))
+    player.update_image() #reference Player class -> update_image function. Put BEFORE drawing the player image default
     window.blit(player.image, player)
 
 
@@ -73,7 +107,7 @@ while True:
     #Hold keys instead of constant pressing
     keys = pygame.key.get_pressed()  #2nd event
     #Boundry: Top
-    if keys[pygame.K_UP] or keys[pygame.K_w] and not player.jumping: #check to see if player is already jumping
+    if (keys[pygame.K_UP] or keys[pygame.K_w]) and not player.jumping: #check to see if player is already jumping
         '''Reconfigured recognizing top boundry as 'gravity' will be added'''
         player.velocity_y = PLAYER_VELOCITY_Y #.velocity_y is called in class Player
         '''Removed Down arrow key as this game will not require ducking or going down'''
@@ -82,9 +116,11 @@ while True:
     #Boundry: Left
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
         player.x = max(player.x-PLAYER_DISTANCE,0)
+        player.direction = "left" #references .direction in Player class
     #Boundry: Right
     if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         player.x = min(player.x+PLAYER_DISTANCE,GAME_WIDTH-player.width)
+        player.direction = "right" #references .direction in Player class
 
     '''Move function added'''
     move()
