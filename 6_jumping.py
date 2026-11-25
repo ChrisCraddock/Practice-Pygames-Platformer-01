@@ -107,7 +107,7 @@ while True:
     #Hold keys instead of constant pressing
     keys = pygame.key.get_pressed()  #2nd event
     #Boundry: Top
-    if (keys[pygame.K_UP] or keys[pygame.K_w]) and not player.jumping: #check to see if player is already jumping
+    if (keys[pygame.K_UP] or keys[pygame.K_w] or keys[pygame.K_SPACE]) and not player.jumping: #check to see if player is already jumping
         '''Reconfigured recognizing top boundry as 'gravity' will be added'''
         player.velocity_y = PLAYER_VELOCITY_Y #.velocity_y is called in class Player
         '''Removed Down arrow key as this game will not require ducking or going down'''
