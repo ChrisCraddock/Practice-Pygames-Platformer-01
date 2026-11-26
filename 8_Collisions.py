@@ -106,6 +106,7 @@ def check_tile_collision(): #if player hits a tile, return the tile otherwise do
     for tile in tiles:
         if player.colliderect(tile):
             return tile
+    return None
 
 
 def check_tile_collision_x(): #check for collision on x-axis

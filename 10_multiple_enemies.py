@@ -107,12 +107,17 @@ def create_map():
         tile = Tile(TILE_SIZE*3, (i+10)*TILE_SIZE, floor_tile_image)
         tiles.append(tile)
 
+    '''added'''
+    for i in range(3):
+        metall = Metall(player.x+TILE_SIZE*(3+i*1.5), TILE_SIZE*6) #3 tiles to the right of the player
+        metalls.append(metall)
+
 #Check_Tile_Collision function
 def check_tile_collision(character): #if player hits a tile, return the tile otherwise do nothing
     for tile in tiles:
         if character.colliderect(tile):
             return tile
-
+    return None
 #Check_Tile_Collision on x-axis
 def check_tile_collision_x(character): #check for collision on x-axis
     tile = check_tile_collision(character)
@@ -157,12 +162,14 @@ def move(): #movement
   
     check_tile_collision_y(player) #check for collision on y-axis 2nd
     #enemy y movement
-    metall.velocity_y += GRAVITY
-    metall.y += metall.velocity_y
-    check_tile_collision_y(metall)
+    '''added'''
+    for metall in metalls: #for each metall apply gravity
+        metall.velocity_y += GRAVITY
+        metall.y += metall.velocity_y
+        check_tile_collision_y(metall)
 
-    if player.colliderect(metall):
-        print("Collision with Metall")
+        if player.colliderect(metall):
+            print("Collision with Metall")
 
 #Draw Function
 def draw():
@@ -172,11 +179,15 @@ def draw():
         window.blit(tile.image, tile)
     player.update_image() #reference Player class -> update_image function. Put BEFORE drawing the player image default
     window.blit(player.image, player)
-    window.blit(metall.image, metall)
+    '''added'''
+    for metall in metalls:
+        window.blit(metall.image, metall)
 
 #start game
 player = Player()
-metall = Metall(player.x + TILE_SIZE*3, TILE_SIZE*6) #3 tiles from player standing
+'''removed'''
+#metall = Metall(player.x + TILE_SIZE*3, TILE_SIZE*6) #3 tiles from player standing
+metalls = [] #list to store Metalls
 tiles = [] #list to store variables
 create_map()
 

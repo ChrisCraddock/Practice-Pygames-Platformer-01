@@ -114,6 +114,7 @@ def check_tile_collision(character): #if player hits a tile, return the tile oth
     for tile in tiles:
         if character.colliderect(tile):
             return tile
+    return None
 '''replace player w/ character and add character as param'''
 #Check_Tile_Collision on x-axis
 def check_tile_collision_x(character): #check for collision on x-axis
