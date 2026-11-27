@@ -64,6 +64,9 @@ class Player(pygame.Rect): #class Player(inherit pygame.Rect)
         self.direction = "right" #set default direction to "right"
         self.jumping = False #keep from constant jumping
         self.invincible = False #for when collision with ads
+        '''added'''
+        self.max_health = 28
+        self.health = self.max_health
 
     
     def update_image(self):
